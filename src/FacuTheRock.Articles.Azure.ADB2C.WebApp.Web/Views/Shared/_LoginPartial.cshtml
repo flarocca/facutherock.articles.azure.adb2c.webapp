@@ -1,0 +1,12 @@
+﻿@*Step 7: Add _LoginPartial.html*@
+<ul class="nav navbar-nav navbar-right">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <li><a asp-area="" asp-controller="Session" asp-action="EditProfile">Hello @User.Identity.Name!</a></li>
+        <li><a asp-area="" asp-controller="Session" asp-action="SignOut">Sign out</a></li>
+    }
+    else
+    {
+        <li><a asp-area="" asp-controller="Session" asp-action="SignIn">Sign in</a></li>
+    }
+</ul>
