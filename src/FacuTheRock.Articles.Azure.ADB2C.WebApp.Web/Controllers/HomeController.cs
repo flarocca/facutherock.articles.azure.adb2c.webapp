@@ -1,13 +1,10 @@
-﻿using FacuTheRock.Articles.Azure.ADB2C.WebApp.Web.Models;
+﻿using FacuTheRock.Articles.Azure.ADB2C.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace FacuTheRock.Articles.Azure.ADB2C.WebApp.Web.Controllers
+namespace FacuTheRock.Articles.Azure.ADB2C.WebApp.MVC.Controllers
 {
     public class HomeController : Controller
     {
@@ -29,7 +26,7 @@ namespace FacuTheRock.Articles.Azure.ADB2C.WebApp.Web.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public async Task<IActionResult> Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }

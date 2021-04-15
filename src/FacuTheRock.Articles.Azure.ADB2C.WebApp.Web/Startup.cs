@@ -1,18 +1,14 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 
-namespace FacuTheRock.Articles.Azure.ADB2C.WebApp.Web
+namespace FacuTheRock.Articles.Azure.ADB2C.WebApp.MVC
 {
     public class Startup
     {
@@ -25,22 +21,21 @@ namespace FacuTheRock.Articles.Azure.ADB2C.WebApp.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                options.HandleSameSiteCookieCompatibility();
+            });
 
-            // Step 3: Configure Authentication & Open ID Connect Provider
-            services.AddAuthentication(sharedOptions =>
-            {
-                sharedOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                sharedOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            })
-            .AddOpenIdConnect(options =>
-            {
-                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.ClientId = Configuration.GetValue<string>("ADB2C:ClientId");
-                options.Authority = Configuration.GetValue<string>("ADB2C:UserFlowEndpoint");
-                options.TokenValidationParameters = new TokenValidationParameters() { NameClaimType = "name" };
-            })
-            .AddCookie();
+            services.AddControllersWithViews()
+                .AddMicrosoftIdentityUI();
+
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAdB2C") 
+                .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:Scope"] })
+                .AddInMemoryTokenCaches();
+
+            //services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureAdB2C"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
